@@ -6,6 +6,7 @@ namespace app\modules\v1\controllers\admin;
 
 use app\modules\admin\models\AuthItem;
 use app\modules\admin\models\AuthItemChild;
+use app\modules\v1\components\CorsCustom;
 use app\modules\v1\controllers\BaseApiController;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
@@ -21,6 +22,9 @@ class AuthItemController extends Controller
     {
 
         $behaviors = parent::behaviors();
+        $behaviors['corsFilter'] = [
+            'class' => CorsCustom::className(),
+        ];
         $behaviors['authenticator'] = [
             'class' => JwtHttpBearerAuth::class,
             //  'except' => ['login'],
