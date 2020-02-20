@@ -1,0 +1,30 @@
+<?php
+
+namespace app\modules\icase\controllers;
+
+use yii\web\Controller;
+
+/**
+ * Default controller for the `icase` module
+ */
+class DefaultController extends Controller
+{
+    /**
+     * Renders the index view for the module
+     * @return string
+     */
+    public function actionIndex()
+    {
+        return $this->render('index');
+    }
+
+    public function actionError()
+    {
+        $exception = \Yii::$app->errorHandler->exception;
+        if ($exception !== null) {
+            $this->layout = '@app/views/layouts/error';
+
+            return $this->render('@app/views/site/error',['exception' => $exception]);
+        }
+    }
+}
