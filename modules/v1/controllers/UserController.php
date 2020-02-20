@@ -1,55 +1,63 @@
 <?php
 
-
 namespace app\modules\v1\controllers;
 
-use app\modules\toquv\models\ToquvMusteri;
-use app\modules\v1\components\CorsCustom;
-use app\modules\v1\models\Users;
-use yii\data\ActiveDataProvider;
-use yii\filters\auth\HttpBearerAuth;
-use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\rest\ActiveController;
-use yii\web\ForbiddenHttpException;
-use yii\web\Response;
+use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
 
-class UserController extends BaseApiController
+class UserController extends \yii\rest\ActiveController
 {
-    public $modelClass = 'app\modules\v1\models\Users';
-
+    public $modelClass = 'app\models\AdminUsers';
+//    public $serializer = [
+//        'class' => 'app\components\MySerializer',
+//        'collectionEnvelope' => 'items',
+//    ];
 
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'login' => ['POST'],
-                ],
-            ],
 
-        ]);
+        $behaviors = parent::behaviors();
+        $behaviors['authenticator'] = [
+            'class' => JwtHttpBearerAuth::class,
+            'except' => ['login'],
+        ];
+        return $behaviors;
     }
 
     public function actionLogin()
     {
-        $request = Yii::$app->getRequest();
-        $username = $request->bodyParams['username'];
-        $password = $request->bodyParams['password'];
-        $user = Users::findByUsername($username);
-        if ($user && $user->validatePassword($password)) {
-            $user->generateToken();
-            $user->last_login_date = date("Y-m-d H:i:s");
-            $user->save();
-            return $this->asJson(['token' => $user->token]);
-        } else {
-            return $this->asJson(['success' => false, 'error' => $user->getErrors(), 'userpas' => $user->password, 'jsonpas' => md5($password)]);
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $username = Yii::$app->request->post('username');
+        $pass = Yii::$app->request->post('password');
+
+        $modelUser = \app\models\AdminUsers::findByUsername($username);
+
+        if ($modelUser && $modelUser->validatePassword($pass)) {
+            $token = (string)\app\models\AdminUsers::generateToken($modelUser->id);
+
+            return [
+                'status' => true,
+                'message' => 'Success',
+                'token' => $token,
+                'permissions' => $this->getPermissions($modelUser->id)
+            ];
         }
 
-
+        return [
+            'status' => false,
+            'message' => 'Wrong username or password'
+        ];
     }
 
+    protected function getPermissions($id)
+    {
+        $perms = Yii::$app->authManager->getPermissionsByUser($id);
+        $userPerms = [];
+        foreach ($perms as $key => $perm){
+            array_push($userPerms,$key);
+        }
+        return $userPerms;
+    }
 
 }

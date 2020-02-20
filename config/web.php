@@ -3,6 +3,8 @@
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
+$api_rules = require __DIR__ . '/api_rules.php';
+
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
@@ -108,57 +110,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             // 'enableStrictParsing' => true,
-            'rules' => [
-//                [
-//                    'class' => 'yii\rest\UrlRule',
-//                    'controller' => ['v1/user', 'v1/test'],
-//                    'pluralize' => false,
-//                    'prefix' => 'api',
-//                    'extraPatterns' => [
-//                        'POST login' => 'login',
-//                        'POST test' => 'test'
-//                    ],
-//
-//                ],
-//                [
-//                    'class' => 'yii\rest\UrlRule',
-//                    'controller' => ['v1/rest'],
-//                    'pluralize' => false,
-//                    'prefix' => 'api',
-//                    'extraPatterns' => [
-//                        'GET auth' => 'auth',
-//                    ],
-//
-//                ],
-//                [
-//                    'class' => 'yii\rest\UrlRule',
-//                    'controller' => ['v1/auth'],
-//                    'pluralize' => false,
-//                    'prefix' => 'api',
-//                    'extraPatterns' => [
-//                        'POST login' => 'login',
-//                    ],
-//
-//                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/top' => 'v1/icase/test'],
-                    'pluralize' => false,
-                    'prefix' => 'api',
-                    'extraPatterns' => [
-                        'GET test' => 'test',
-                    ],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/ins-insured-clients' => 'v1/icase/ins-insured-clients'],
-                    'pluralize' => false,
-                    'prefix' => 'api',
-                    'extraPatterns' => [
-                        'GET test' => 'test',
-                    ],
-                ]
-            ],
+            'rules' => $api_rules,
         ],
     ],
     'params' => $params,
