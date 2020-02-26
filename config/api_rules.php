@@ -7,6 +7,7 @@ return [
         'pluralize' => false,
         'prefix' => 'api',
         'extraPatterns' => [
+            'OPTIONS login' => 'login',
             'POST login' => 'login',
 
         ],

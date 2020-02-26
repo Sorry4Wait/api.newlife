@@ -2,10 +2,14 @@
 
 namespace app\modules\v1\controllers;
 
+use app\modules\v1\components\CorsCustom;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
+use yii\rest\ActiveController;
+use yii\rest\Controller;
+use yii\web\NotFoundHttpException;
 
-class UserController extends \yii\rest\ActiveController
+class UserController extends Controller
 {
     public $modelClass = 'app\models\AdminUsers';
 //    public $serializer = [
@@ -13,14 +17,30 @@ class UserController extends \yii\rest\ActiveController
 //        'collectionEnvelope' => 'items',
 //    ];
 
+    public $enableCsrfValidation = false;
+
     public function behaviors()
     {
-
         $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => JwtHttpBearerAuth::class,
-            'except' => ['login'],
+
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                // restrict access to
+                'Access-Control-Allow-Origin' => ['*'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                // Allow only POST and PUT methods
+                'Access-Control-Request-Headers' => ['*'],
+                // Allow only headers 'X-Wsse'
+                'Access-Control-Allow-Credentials' => true,
+                // Allow OPTIONS caching
+                'Access-Control-Max-Age' => 86400,
+                // Allow the X-Pagination-Current-Page header to be exposed to the browser.
+                'Access-Control-Expose-Headers' => [],
+            ]
         ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+          $behaviors['authenticator']['except'] = ['options'];
         return $behaviors;
     }
 
@@ -44,18 +64,15 @@ class UserController extends \yii\rest\ActiveController
             ];
         }
 
-        return [
-            'status' => false,
-            'message' => 'Wrong username or password'
-        ];
+        throw new NotFoundHttpException();
     }
 
     protected function getPermissions($id)
     {
         $perms = Yii::$app->authManager->getPermissionsByUser($id);
         $userPerms = [];
-        foreach ($perms as $key => $perm){
-            array_push($userPerms,$key);
+        foreach ($perms as $key => $perm) {
+            array_push($userPerms, $key);
         }
         return $userPerms;
     }

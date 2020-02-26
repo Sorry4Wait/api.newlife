@@ -50,7 +50,8 @@ class BaseApiController extends ActiveController
             ],
 
             [
-                'class' => \sizeg\jwt\JwtHttpBearerAuth::class
+                'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+                'except' => ['login']
             ]
         ]);
     }
