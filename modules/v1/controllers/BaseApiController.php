@@ -25,11 +25,11 @@ class BaseApiController extends ActiveController
 
     public function checkAccess($action, $model = null, $params = [])
     {
-        if (Yii::$app->authManager->getPermission($this->controllerName . "/" . $action)) {
-            if (!Yii::$app->user->can($this->controllerName . "/" . $action)) {
-                throw new ForbiddenHttpException();
-            }
-        }
+//        if (Yii::$app->authManager->getPermission($this->controllerName . "/" . $action)) {
+//            if (!Yii::$app->user->can($this->controllerName . "/" . $action)) {
+//                throw new ForbiddenHttpException();
+//            }
+//        }
 
         parent::checkAccess($action, $model, $params);
     }

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\modules\admin\models\AuthAssignment;
 use app\modules\icase\models\InsAppformClients;
 use app\modules\icase\models\InsApphealthDeclaration;
 use sizeg\jwt\Jwt;
@@ -32,6 +33,9 @@ use yii\web\UnauthorizedHttpException;
  */
 class AdminUsers extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public $confirm_password;
+    public $roles = [];
+
     /**
      * {@inheritdoc}
      */
@@ -49,9 +53,11 @@ class AdminUsers extends \yii\db\ActiveRecord implements IdentityInterface
             [['login', 'password', 'first_name', 'last_name', 'department_id'], 'required'],
             [['current_position_id', 'department_id', 'status', 'employee_id'], 'default', 'value' => null],
             [['current_position_id', 'department_id', 'status', 'employee_id'], 'integer'],
-            [['last_login_date', 'create_date'], 'safe'],
+            [['last_login_date', 'create_date','roles'], 'safe'],
             [['login'], 'string', 'max' => 30],
             [['password'], 'string', 'max' => 255],
+            [['password', 'confirm_password'], 'required'],
+            ['confirm_password', 'compare', 'compareAttribute' => 'password', 'message' => Yii::t('messages', "The password and confirm password do not match.")],
             [['first_name', 'last_name'], 'string', 'max' => 50],
             [['login', 'employee_id'], 'unique', 'targetAttribute' => ['login', 'employee_id']],
         ];
@@ -74,6 +80,23 @@ class AdminUsers extends \yii\db\ActiveRecord implements IdentityInterface
             'last_login_date' => 'Last Login Date',
             'create_date' => 'Create Date',
             'employee_id' => 'Employee ID',
+        ];
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'login',
+            'first_name',
+            'last_name',
+            'department_id',
+            'status',
+            'password' => function(){
+                return "";
+            },
+            'confirm_password',
+            'roles' => [$this,'getRoles'],
         ];
     }
 
@@ -204,5 +227,17 @@ class AdminUsers extends \yii\db\ActiveRecord implements IdentityInterface
             ->getToken(); // Retrieves the generated token
 
         return $token;
+    }
+
+    public function getRoles()
+    {
+        $roles = AuthAssignment::find()->select('item_name')->where(['user_id' => $this->id])->all();
+        $arr = [];
+        if ($roles) {
+            foreach ($roles as $role) {
+                array_push($arr, $role['item_name']);
+            }
+        }
+        return $arr;
     }
 }

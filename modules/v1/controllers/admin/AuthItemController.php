@@ -8,29 +8,18 @@ use app\modules\admin\models\AuthItem;
 use app\modules\admin\models\AuthItemChild;
 use app\modules\v1\components\CorsCustom;
 use app\modules\v1\controllers\BaseApiController;
+use app\modules\v1\controllers\BaseApiRestController;
 use sizeg\jwt\JwtHttpBearerAuth;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
-class AuthItemController extends Controller
+class AuthItemController extends BaseApiRestController
 {
     public $controllerName = 'auth-item';
 
-    public function behaviors()
-    {
 
-        $behaviors = parent::behaviors();
-        $behaviors['corsFilter'] = [
-            'class' => CorsCustom::className(),
-        ];
-        $behaviors['authenticator'] = [
-            'class' => JwtHttpBearerAuth::class,
-            //  'except' => ['login'],
-        ];
-        return $behaviors;
-    }
 
     public function actionList()
     {

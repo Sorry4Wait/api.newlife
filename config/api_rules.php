@@ -3,12 +3,34 @@
 return [
     [
         'class' => 'yii\rest\UrlRule',
-        'controller' => ['v1/user'],
+        'controller' => ['v1/site'],
         'pluralize' => false,
         'prefix' => 'api',
         'extraPatterns' => [
-            'OPTIONS login' => 'login',
-            'POST login' => 'login',
+            'POST,OPTIONS login' => 'login',
+
+        ],
+    ],
+    [
+        'class' => 'yii\rest\UrlRule',
+        'controller' => ['v1/user' => 'v1/admin/user'],
+        'pluralize' => false,
+        'prefix' => 'api',
+        'extraPatterns' => [
+            'POST,OPTIONS index' => 'index',
+            'POST,OPTIONS update' => 'update',
+            'GET,OPTIONS get/<id>' => 'get',
+            'DELETE,OPTIONS delete/<id>' => 'delete'
+
+        ],
+    ],
+    [
+        'class' => 'yii\rest\UrlRule',
+        'controller' => ['v1/role' => 'v1/admin/role'],
+        'pluralize' => false,
+        'prefix' => 'api',
+        'extraPatterns' => [
+            'GET,OPTIONS list' => 'list',
 
         ],
     ],
@@ -18,8 +40,8 @@ return [
         'pluralize' => false,
         'prefix' => 'api',
         'extraPatterns' => [
-            'GET permissions' => 'permissions',
-            'GET index' => 'index',
+            'GET,OPTIONS permissions' => 'permissions',
+            'GET,OPTIONS index' => 'index',
             'POST assign' => 'assign',
             'GET update' => 'update',
             'POST create' => 'create',

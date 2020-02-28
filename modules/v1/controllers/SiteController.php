@@ -9,19 +9,15 @@ use yii\rest\ActiveController;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
-class UserController extends Controller
+class SiteController extends Controller
 {
-    public $modelClass = 'app\models\AdminUsers';
-//    public $serializer = [
-//        'class' => 'app\components\MySerializer',
-//        'collectionEnvelope' => 'items',
-//    ];
 
     public $enableCsrfValidation = false;
 
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+
 
         $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
