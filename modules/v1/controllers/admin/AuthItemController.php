@@ -20,40 +20,57 @@ class AuthItemController extends BaseApiRestController
     public $controllerName = 'auth-item';
 
 
-
     public function actionList()
     {
         return $this->asJson(Yii::$app->authManager->getPermissions());
     }
 
-    public function actionIndex($limit = 10, $page = 1)
+    public function actionIndex()
     {
-        $query = AuthItem::find()->where(['type' => 1])->offset($page);
+        $search = \Yii::$app->request->post()['search'];
+        $limit = \Yii::$app->request->post()['limit'];
+        $page = \Yii::$app->request->post()['page'];
+        $page = $page === 1 ? 0  : ($page - 1) * $limit;
+        $query = AuthItem::find()->where(['type' => 1])
+            ->offset($page)
+            ->limit($limit);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'defaultPageSize' => $limit, //set page size here
-            ]
+            'pagination' => false
         ]);
-        $items = $dataProvider->getModels();
+        $relationShips = $dataProvider->getModels();
         $response = [];
-        $response['items'] = $items;
-        $response['total'] = $dataProvider->getTotalCount();
-
+        $response['items'] = $relationShips;
+        $response['total'] = AuthItem::find()->where(['type' => 1])->count();
         return $this->asJson($response);
     }
-    public function actionUpdate($id)
-    {
 
+    public function actionUpdate()
+    {
+        $model = new AuthItem();
+
+        if (\Yii::$app->request->post('AuthItem')['name'] !== null) {
+            $model = AuthItem::findOne(\Yii::$app->request->post('AuthItem')['name']);
+        }
+
+        if ($model->load(\Yii::$app->request->post())) {
+            $model->type = 1;
+            if ($model->save()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
+
     public function actionCreate()
     {
-      $model = new AuthItem();
-      $arr = [];
-      $arr['AuthItem'] = Yii::$app->request->post();
-      $model->load($arr);
-      $model->type = 1;
-      return $model->save();
+        $model = new AuthItem();
+        $arr = [];
+        $arr['AuthItem'] = Yii::$app->request->post();
+        $model->load($arr);
+        $model->type = 1;
+        return $model->save();
     }
 
     /**
@@ -91,6 +108,24 @@ class AuthItemController extends BaseApiRestController
         );
     }
 
+    public function actionGet($id)
+    {
+        $user = AuthItem::find()->where(['name' => $id])->one();
+        if (!$user) {
+            throw  new NotFoundHttpException();
+        }
+        return $this->asJson($user);
+    }
+
+    public function actionDelete($id)
+    {
+        $user = AuthItem::find()->where(['name' => $id])->one();
+        if (!$user) {
+            throw  new NotFoundHttpException();
+        }
+        return $user->delete();
+    }
+
     protected function deletePermission($perm)
     {
         $model = AuthItemChild::find()->where(['child' => $perm])->one();
@@ -104,5 +139,6 @@ class AuthItemController extends BaseApiRestController
             $child->delete();
         }
     }
+
 
 }

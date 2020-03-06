@@ -1,6 +1,6 @@
 <?php
-
-return [
+$directory = require 'rest/directory/directory.php';
+$arr =  [
     [
         'class' => 'yii\rest\UrlRule',
         'controller' => ['v1/site'],
@@ -40,12 +40,13 @@ return [
         'pluralize' => false,
         'prefix' => 'api',
         'extraPatterns' => [
-            'GET,OPTIONS permissions' => 'permissions',
-            'GET,OPTIONS index' => 'index',
-            'POST assign' => 'assign',
-            'GET update' => 'update',
-            'POST create' => 'create',
-            'DELETE delete' => 'delete'
+            'POST,OPTIONS permissions' => 'permissions',
+            'POST,OPTIONS index' => 'index',
+            'POST,OPTIONS assign' => 'assign',
+            'POST,OPTIONS update' => 'update',
+            'POST,OPTIONS create' => 'create',
+            'GET,OPTIONS get/<id>' => 'get',
+            'DELETE,OPTIONS delete/<id>' => 'delete'
         ],
     ],
     [
@@ -58,3 +59,5 @@ return [
         ],
     ]
 ];
+
+return array_merge($arr,$directory);

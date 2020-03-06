@@ -55,6 +55,7 @@ class SiteController extends Controller
             return [
                 'status' => true,
                 'message' => 'Success',
+                'user' => $modelUser,
                 'token' => $token,
                 'permissions' => $this->getPermissions($modelUser->id)
             ];

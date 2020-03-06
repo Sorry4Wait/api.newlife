@@ -21,21 +21,24 @@ class UserController extends BaseApiRestController
         $search = \Yii::$app->request->post()['search'];
         $limit = \Yii::$app->request->post()['limit'];
         $page = \Yii::$app->request->post()['page'];
+        $page = $page === 1 ? 0  : ($page - 1) * $limit;
         $query = AdminUsers::find()
             ->where(['like', 'login', $search,])
             ->orWhere(['like', 'first_name', $search,])
             ->orWhere(['like', 'last_name', $search,])
-            ->offset($page);
+            ->offset($page)
+            ->limit($limit);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'defaultPageSize' => $limit, //set page size here
-            ]
+            'pagination' => false
         ]);
         $relationShips = $dataProvider->getModels();
         $response = [];
         $response['items'] = $relationShips;
-        $response['total'] = $dataProvider->getTotalCount();
+        $response['total'] = AdminUsers::find()
+            ->where(['like', 'login', $search,])
+            ->orWhere(['like', 'first_name', $search,])
+            ->orWhere(['like', 'last_name', $search,])->count();
         return $this->asJson($response);
     }
 

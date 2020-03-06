@@ -26,8 +26,6 @@ class BaseApiRestController extends Controller
             'class' => JwtHttpBearerAuth::class,
             // 'except' => ['index'],
         ];
-        // re-add authentication filter
-        $behaviors['authenticator'] = $auth;
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
         $behaviors['authenticator']['except'] = ['options'];
 
